@@ -1,0 +1,48 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static %}
+
+{% block extrahead %}
+    {{ block.super }}
+    {{ media }}
+    <script src="{% static 'admin/js/cancel.js' %}" async></script>
+{% endblock %}
+
+{% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} delete-confirmation{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">Home</a>
+ &rsaquo; <a href="{% url 'admin:app_list' 'backup_admin' %}">Backup Admin</a>
+ &rsaquo; <a href="{% url 'admin:backup_admin_backup_changelist' %}">Backups</a>
+{% if backup is not None %}
+ &rsaquo; <a href="{% url 'admin:backup_admin_backup_change' backup.id %}">Backup: {{backup.timestamp}}</a>
+{% endif %}
+</div>
+{% endblock %}
+
+{% block content %}
+{% if len is 0 %}
+    <div>
+        <h2>No new backups were found on the filesystem</h2>
+        <h2>Database Backups are up-to-date</h2><br>
+        <form action="{% url 'admin:backup_admin_backup_changelist' %}">
+            <input type="submit" value="Return back to admin pages" style="background-color: #79aec8;" />
+        </form>
+    </div>
+{% else %}
+    <div>
+        <h2>The following backups were retrieved from the filesystem</h2>
+        <ul>
+        {% for b in backups %}
+            <li>
+                <a href="{% url 'admin:backup_admin_backup_change' b.id %}">{{b.timestamp}}</a>
+                <p>File:  <strong>{{b.backup_file}}</strong></p>
+            </li>
+        {% endfor %}
+        </ul>
+        <form action="{% url 'admin:backup_admin_backup_changelist' %}">
+            <input type="submit" value="Return back to admin pages" style="background-color: #79aec8;" />
+        </form>
+    </div>
+{% endif %}
+{% endblock %}

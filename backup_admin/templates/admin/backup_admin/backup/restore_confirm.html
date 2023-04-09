@@ -1,0 +1,65 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static %}
+
+{% block extrahead %}
+    {{ block.super }}
+    {{ media }}
+    <script src="{% static 'admin/js/cancel.js' %}" async></script>
+{% endblock %}
+
+{% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} delete-confirmation{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">Home</a>
+ &rsaquo; <a href="{% url 'admin:app_list' 'backup_admin' %}">Backup Admin</a>
+ &rsaquo; <a href="{% url 'admin:backup_admin_backup_changelist' %}">Backups</a>
+{% if backup is not None %}
+ &rsaquo; <a href="{% url 'admin:backup_admin_backup_change' backup.id %}">Backup: {{backup.timestamp}}</a>
+{% endif %}
+</div>
+{% endblock %}
+{% block content %}
+{% if restored is False and errors is None %}
+    {% if backup is not None %}
+        <p>Are you sure you want to restore the backup taken on "{{ backup.timestamp }}"?</p>
+        <h2>{% translate "File: " %}</h2>
+        <ul>{{ backup.backup_file }}</ul>
+        <h2>{% translate "All Objects will be altered" %}</h2>
+        <ul>{{ deleted_objects|unordered_list }}</ul>
+        <form method="POST" action="{% url 'restore_backup' backup.id %}">{% csrf_token %}
+            <div>
+                <input type="submit" value="{% translate 'Yes, I’m sure' %}">
+                <a href="#" class="button cancel-link">{% translate "No, take me back" %}</a>
+            </div>
+        </form>
+    {% else %}
+        <p>Are you sure you want to restore the latest backup on the filesystem?</p>
+        <form method="POST" action="{% url 'restore_last_backup' %}">{% csrf_token %}
+            <div>
+                <input type="submit" value="{% translate 'Yes, I’m sure' %}">
+                <a href="#" class="button cancel-link">{% translate "No, take me back" %}</a>
+            </div>
+        </form>
+    {% endif %}
+{% else %}
+    {% if errors %}
+        <h2>Problems encountered while restoring backup</h2>
+        <h2>{{ errors }}</h2>
+        <p>&nbsp;&nbsp;&nbsp; File:    <strong>{{backup_file}}</strong></p>
+            <div>
+                <form action="{% url 'admin:backup_admin_backup_changelist'%}">
+                    <input type="submit" value="Return back to admin pages" style="background-color: #79aec8;" />
+                </form>
+            </div>
+    {% else %}
+        <h2>Backup Restored Successfully</h2>
+        <p>&nbsp;&nbsp;&nbsp; File:    <strong>{{backup_file}}</strong></p>
+            <div>
+                <form action="{% url 'admin:backup_admin_backup_changelist'%}">
+                    <input type="submit" value="Return back to admin pages" style="background-color: #79aec8;" />
+                </form>
+            </div>
+    {% endif %}
+{% endif %}
+{% endblock %}
