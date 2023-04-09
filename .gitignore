@@ -5,3 +5,6 @@ backs_copy/
 backs_copy
 migrations/
 .vscode
+
+dist
+*.egg-info
