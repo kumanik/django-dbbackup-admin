@@ -4,6 +4,7 @@ backs/
 backs_copy/
 backs_copy
 migrations/
+.env
 .vscode
 
 dist

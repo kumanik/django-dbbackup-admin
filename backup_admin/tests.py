@@ -46,4 +46,4 @@ class BakTest(TransactionTestCase):
         self.load_baks()
         self.bak()
         self.rstr()
-        # self.delte()
+        self.delte()
