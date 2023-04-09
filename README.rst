@@ -1,7 +1,3 @@
 =====
-Polls
+BACKUP ADMIN
 =====
-
-
-Quick start
------------
